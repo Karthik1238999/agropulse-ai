@@ -1,0 +1,431 @@
+{
+  "farm": {
+    "id": "GVF-001",
+    "name": "Green Valley Farm",
+    "region": "Andhra Pradesh",
+    "country": "India",
+    "location": {
+      "latitude": 16.4028,
+      "longitude": 80.5624
+    },
+    "areaAcres": 42,
+    "elevationMeters": 32,
+    "description": "Synthetic agricultural dataset representing a rural multi-crop farm in Andhra Pradesh."
+  },
+
+  "fields": [
+    {
+      "id": "F01",
+      "name": "North Field",
+      "crop": "Rice",
+      "areaAcres": 12,
+      "soilType": "Clay Loam",
+      "soilPh": 6.7,
+      "nitrogen": 78,
+      "phosphorus": 42,
+      "potassium": 68,
+      "boundary": [
+        [16.4048, 80.5598],
+        [16.4062, 80.5598],
+        [16.4062, 80.5628],
+        [16.4048, 80.5628]
+      ]
+    },
+    {
+      "id": "F02",
+      "name": "East Field",
+      "crop": "Cotton",
+      "areaAcres": 10,
+      "soilType": "Sandy Loam",
+      "soilPh": 7.0,
+      "nitrogen": 64,
+      "phosphorus": 38,
+      "potassium": 61,
+      "boundary": [
+        [16.4034, 80.5631],
+        [16.4050, 80.5631],
+        [16.4050, 80.5662],
+        [16.4034, 80.5662]
+      ]
+    },
+    {
+      "id": "F03",
+      "name": "South Field",
+      "crop": "Maize",
+      "areaAcres": 9,
+      "soilType": "Loam",
+      "soilPh": 6.4,
+      "nitrogen": 52,
+      "phosphorus": 34,
+      "potassium": 55,
+      "boundary": [
+        [16.4002, 80.5602],
+        [16.4024, 80.5602],
+        [16.4024, 80.5635],
+        [16.4002, 80.5635]
+      ]
+    },
+    {
+      "id": "F04",
+      "name": "West Field",
+      "crop": "Chilli",
+      "areaAcres": 11,
+      "soilType": "Red Loam",
+      "soilPh": 6.8,
+      "nitrogen": 71,
+      "phosphorus": 45,
+      "potassium": 72,
+      "boundary": [
+        [16.4018, 80.5562],
+        [16.4040, 80.5562],
+        [16.4040, 80.5595],
+        [16.4018, 80.5595]
+      ]
+    }
+  ],
+
+  "observations": [
+    {
+      "date": "2026-08-20",
+      "fieldId": "F01",
+      "temperature": 28.1,
+      "humidity": 71,
+      "rainfallMm": 4.2,
+      "soilMoisture": 76,
+      "cropHealth": 92,
+      "diseasePressure": 14,
+      "waterStress": 18,
+      "heatStress": 32
+    },
+    {
+      "date": "2026-08-20",
+      "fieldId": "F02",
+      "temperature": 28.4,
+      "humidity": 68,
+      "rainfallMm": 3.8,
+      "soilMoisture": 67,
+      "cropHealth": 87,
+      "diseasePressure": 18,
+      "waterStress": 25,
+      "heatStress": 36
+    },
+    {
+      "date": "2026-08-20",
+      "fieldId": "F03",
+      "temperature": 29.2,
+      "humidity": 64,
+      "rainfallMm": 2.1,
+      "soilMoisture": 51,
+      "cropHealth": 78,
+      "diseasePressure": 25,
+      "waterStress": 43,
+      "heatStress": 48
+    },
+    {
+      "date": "2026-08-20",
+      "fieldId": "F04",
+      "temperature": 28.6,
+      "humidity": 69,
+      "rainfallMm": 3.4,
+      "soilMoisture": 70,
+      "cropHealth": 90,
+      "diseasePressure": 16,
+      "waterStress": 22,
+      "heatStress": 38
+    },
+
+    {
+      "date": "2026-08-21",
+      "fieldId": "F01",
+      "temperature": 27.8,
+      "humidity": 74,
+      "rainfallMm": 6.1,
+      "soilMoisture": 79,
+      "cropHealth": 93,
+      "diseasePressure": 13,
+      "waterStress": 15,
+      "heatStress": 29
+    },
+    {
+      "date": "2026-08-21",
+      "fieldId": "F02",
+      "temperature": 28.1,
+      "humidity": 70,
+      "rainfallMm": 5.2,
+      "soilMoisture": 69,
+      "cropHealth": 88,
+      "diseasePressure": 17,
+      "waterStress": 22,
+      "heatStress": 34
+    },
+    {
+      "date": "2026-08-21",
+      "fieldId": "F03",
+      "temperature": 28.7,
+      "humidity": 67,
+      "rainfallMm": 4.0,
+      "soilMoisture": 54,
+      "cropHealth": 79,
+      "diseasePressure": 24,
+      "waterStress": 40,
+      "heatStress": 45
+    },
+    {
+      "date": "2026-08-21",
+      "fieldId": "F04",
+      "temperature": 28.0,
+      "humidity": 72,
+      "rainfallMm": 5.0,
+      "soilMoisture": 73,
+      "cropHealth": 91,
+      "diseasePressure": 15,
+      "waterStress": 20,
+      "heatStress": 35
+    },
+
+    {
+      "date": "2026-08-22",
+      "fieldId": "F01",
+      "temperature": 28.5,
+      "humidity": 70,
+      "rainfallMm": 2.8,
+      "soilMoisture": 75,
+      "cropHealth": 94,
+      "diseasePressure": 12,
+      "waterStress": 17,
+      "heatStress": 31
+    },
+    {
+      "date": "2026-08-22",
+      "fieldId": "F02",
+      "temperature": 28.8,
+      "humidity": 67,
+      "rainfallMm": 2.4,
+      "soilMoisture": 66,
+      "cropHealth": 87,
+      "diseasePressure": 19,
+      "waterStress": 27,
+      "heatStress": 39
+    },
+    {
+      "date": "2026-08-22",
+      "fieldId": "F03",
+      "temperature": 29.6,
+      "humidity": 62,
+      "rainfallMm": 1.2,
+      "soilMoisture": 49,
+      "cropHealth": 77,
+      "diseasePressure": 27,
+      "waterStress": 46,
+      "heatStress": 52
+    },
+    {
+      "date": "2026-08-22",
+      "fieldId": "F04",
+      "temperature": 29.0,
+      "humidity": 66,
+      "rainfallMm": 2.0,
+      "soilMoisture": 68,
+      "cropHealth": 90,
+      "diseasePressure": 17,
+      "waterStress": 24,
+      "heatStress": 40
+    },
+
+    {
+      "date": "2026-08-23",
+      "fieldId": "F01",
+      "temperature": 27.6,
+      "humidity": 77,
+      "rainfallMm": 8.5,
+      "soilMoisture": 82,
+      "cropHealth": 95,
+      "diseasePressure": 11,
+      "waterStress": 12,
+      "heatStress": 27
+    },
+    {
+      "date": "2026-08-23",
+      "fieldId": "F02",
+      "temperature": 28.0,
+      "humidity": 73,
+      "rainfallMm": 7.1,
+      "soilMoisture": 72,
+      "cropHealth": 89,
+      "diseasePressure": 16,
+      "waterStress": 19,
+      "heatStress": 32
+    },
+    {
+      "date": "2026-08-23",
+      "fieldId": "F03",
+      "temperature": 28.4,
+      "humidity": 69,
+      "rainfallMm": 5.8,
+      "soilMoisture": 57,
+      "cropHealth": 80,
+      "diseasePressure": 23,
+      "waterStress": 37,
+      "heatStress": 43
+    },
+    {
+      "date": "2026-08-23",
+      "fieldId": "F04",
+      "temperature": 27.8,
+      "humidity": 75,
+      "rainfallMm": 6.4,
+      "soilMoisture": 76,
+      "cropHealth": 92,
+      "diseasePressure": 14,
+      "waterStress": 18,
+      "heatStress": 33
+    },
+
+    {
+      "date": "2026-08-24",
+      "fieldId": "F01",
+      "temperature": 28.3,
+      "humidity": 73,
+      "rainfallMm": 3.6,
+      "soilMoisture": 78,
+      "cropHealth": 94,
+      "diseasePressure": 12,
+      "waterStress": 15,
+      "heatStress": 30
+    },
+    {
+      "date": "2026-08-24",
+      "fieldId": "F02",
+      "temperature": 28.7,
+      "humidity": 69,
+      "rainfallMm": 3.0,
+      "soilMoisture": 68,
+      "cropHealth": 88,
+      "diseasePressure": 18,
+      "waterStress": 24,
+      "heatStress": 37
+    },
+    {
+      "date": "2026-08-24",
+      "fieldId": "F03",
+      "temperature": 29.4,
+      "humidity": 65,
+      "rainfallMm": 2.0,
+      "soilMoisture": 52,
+      "cropHealth": 78,
+      "diseasePressure": 26,
+      "waterStress": 42,
+      "heatStress": 49
+    },
+    {
+      "date": "2026-08-24",
+      "fieldId": "F04",
+      "temperature": 28.5,
+      "humidity": 71,
+      "rainfallMm": 2.8,
+      "soilMoisture": 71,
+      "cropHealth": 91,
+      "diseasePressure": 15,
+      "waterStress": 21,
+      "heatStress": 36
+    },
+
+    {
+      "date": "2026-08-25",
+      "fieldId": "F01",
+      "temperature": 27.9,
+      "humidity": 75,
+      "rainfallMm": 5.4,
+      "soilMoisture": 80,
+      "cropHealth": 95,
+      "diseasePressure": 10,
+      "waterStress": 13,
+      "heatStress": 28
+    },
+    {
+      "date": "2026-08-25",
+      "fieldId": "F02",
+      "temperature": 28.2,
+      "humidity": 72,
+      "rainfallMm": 4.7,
+      "soilMoisture": 71,
+      "cropHealth": 89,
+      "diseasePressure": 15,
+      "waterStress": 21,
+      "heatStress": 34
+    },
+    {
+      "date": "2026-08-25",
+      "fieldId": "F03",
+      "temperature": 28.9,
+      "humidity": 68,
+      "rainfallMm": 3.3,
+      "soilMoisture": 55,
+      "cropHealth": 81,
+      "diseasePressure": 22,
+      "waterStress": 38,
+      "heatStress": 45
+    },
+    {
+      "date": "2026-08-25",
+      "fieldId": "F04",
+      "temperature": 28.1,
+      "humidity": 74,
+      "rainfallMm": 4.2,
+      "soilMoisture": 74,
+      "cropHealth": 92,
+      "diseasePressure": 13,
+      "waterStress": 18,
+      "heatStress": 34
+    },
+
+    {
+      "date": "2026-08-26",
+      "fieldId": "F01",
+      "temperature": 28.2,
+      "humidity": 72,
+      "rainfallMm": 4.8,
+      "soilMoisture": 79,
+      "cropHealth": 95,
+      "diseasePressure": 10,
+      "waterStress": 14,
+      "heatStress": 29
+    },
+    {
+      "date": "2026-08-26",
+      "fieldId": "F02",
+      "temperature": 28.6,
+      "humidity": 69,
+      "rainfallMm": 4.1,
+      "soilMoisture": 70,
+      "cropHealth": 89,
+      "diseasePressure": 16,
+      "waterStress": 22,
+      "heatStress": 36
+    },
+    {
+      "date": "2026-08-26",
+      "fieldId": "F03",
+      "temperature": 29.1,
+      "humidity": 66,
+      "rainfallMm": 2.9,
+      "soilMoisture": 54,
+      "cropHealth": 80,
+      "diseasePressure": 24,
+      "waterStress": 40,
+      "heatStress": 47
+    },
+    {
+      "date": "2026-08-26",
+      "fieldId": "F04",
+      "temperature": 28.4,
+      "humidity": 71,
+      "rainfallMm": 3.7,
+      "soilMoisture": 73,
+      "cropHealth": 92,
+      "diseasePressure": 14,
+      "waterStress": 20,
+      "heatStress": 35
+    }
+  ]
+}
