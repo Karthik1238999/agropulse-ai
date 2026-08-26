@@ -1,27 +1,80 @@
 "use client";
 
 import Link from "next/link";
-import { Leaf, Lock, Mail, ArrowRight } from "lucide-react";
+import { Leaf, Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setError("");
 
-    if (!email || !password) {
+    if (!email.trim() || !password.trim()) {
       setError("Please enter your email and password.");
       return;
     }
 
-    // Temporary frontend login.
-    // Firebase authentication can be connected later.
-    window.location.href = "/";
+    setLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+
+      // Login successful
+      window.location.href = "/";
+    } catch (error: unknown) {
+      console.error("Login error:", error);
+
+      const firebaseError = error as {
+        code?: string;
+      };
+
+      switch (firebaseError.code) {
+        case "auth/invalid-credential":
+          setError("Invalid email or password.");
+          break;
+
+        case "auth/user-not-found":
+          setError("No account found with this email.");
+          break;
+
+        case "auth/wrong-password":
+          setError("Incorrect password.");
+          break;
+
+        case "auth/invalid-email":
+          setError("Please enter a valid email address.");
+          break;
+
+        case "auth/too-many-requests":
+          setError(
+            "Too many failed attempts. Please try again later."
+          );
+          break;
+
+        case "auth/network-request-failed":
+          setError(
+            "Network error. Please check your internet connection."
+          );
+          break;
+
+        default:
+          setError("Unable to sign in. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,14 +85,21 @@ export default function LoginPage() {
       </div>
 
       <div className="relative w-full max-w-[430px]">
+
         {/* Logo */}
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#7dff9a]/20 bg-[#7dff9a]/10">
-            <Leaf size={26} className="text-[#7dff9a]" />
+            <Leaf
+              size={26}
+              className="text-[#7dff9a]"
+            />
           </div>
 
           <h1 className="mt-5 text-2xl font-semibold tracking-[-0.03em]">
-            AgroPulse <span className="text-[#7dff9a]">AI</span>
+            AgroPulse{" "}
+            <span className="text-[#7dff9a]">
+              AI
+            </span>
           </h1>
 
           <p className="mt-2 text-xs text-[#667269]">
@@ -49,6 +109,8 @@ export default function LoginPage() {
 
         {/* Login card */}
         <div className="rounded-2xl border border-white/[0.07] bg-[#0a0f0c] p-6 shadow-2xl">
+
+          {/* Header */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold">
               Welcome back
@@ -59,10 +121,18 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          {/* Login form */}
+          <form
+            onSubmit={handleLogin}
+            className="space-y-4"
+          >
+
             {/* Email */}
             <div>
-              <label className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]">
+              <label
+                htmlFor="email"
+                className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]"
+              >
                 Email
               </label>
 
@@ -73,18 +143,26 @@ export default function LoginPage() {
                 />
 
                 <input
+                  id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) =>
+                    setEmail(e.target.value)
+                  }
                   placeholder="farmer@example.com"
-                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40"
+                  autoComplete="email"
+                  disabled={loading}
+                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]">
+              <label
+                htmlFor="password"
+                className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]"
+              >
                 Password
               </label>
 
@@ -95,42 +173,61 @@ export default function LoginPage() {
                 />
 
                 <input
+                  id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
                   placeholder="Enter your password"
-                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40"
+                  autoComplete="current-password"
+                  disabled={loading}
+                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
             </div>
 
             {/* Error */}
             {error && (
-              <div className="rounded-xl border border-[#ff6b6b]/20 bg-[#ff6b6b]/10 px-3 py-2 text-[10px] text-[#ff7b7b]">
+              <div
+                role="alert"
+                className="rounded-xl border border-[#ff6b6b]/20 bg-[#ff6b6b]/10 px-3 py-2 text-[10px] leading-4 text-[#ff7b7b]"
+              >
                 {error}
               </div>
             )}
 
-            {/* Login */}
+            {/* Login button */}
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7dff9a] py-3 text-xs font-semibold text-[#071008] transition hover:bg-[#9affad]"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7dff9a] py-3 text-xs font-semibold text-[#071008] transition hover:bg-[#9affad] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Sign in
-              <ArrowRight size={14} />
+              {loading ? (
+                <>
+                  <Loader2
+                    size={14}
+                    className="animate-spin"
+                  />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign in
+                  <ArrowRight size={14} />
+                </>
+              )}
             </button>
           </form>
 
-          {/* Demo notice */}
+          {/* Security notice */}
           <div className="mt-5 rounded-xl border border-[#7dff9a]/10 bg-[#7dff9a]/[0.03] p-3">
             <p className="text-[9px] leading-4 text-[#667269]">
-              Demo mode: any non-empty email and password will open the
-              dashboard. Real authentication can be connected with Firebase
-              later.
+              Secure authentication powered by Firebase.
             </p>
           </div>
 
-          {/* Back */}
+          {/* Continue without signing in */}
           <Link
             href="/"
             className="mt-5 block text-center text-[10px] text-[#667269] transition hover:text-white"
@@ -139,6 +236,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
+        {/* Footer */}
         <p className="mt-6 text-center text-[9px] text-[#4f5b53]">
           AgroPulse AI · Agricultural Intelligence Platform
         </p>
