@@ -9,6 +9,7 @@ import {
   Droplets,
   Leaf,
   LogIn,
+  LogOut,
   Map,
   Settings,
   ShieldCheck,
@@ -17,6 +18,14 @@ import {
   Wind,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+
+import {
+  onAuthStateChanged,
+  signOut,
+  User,
+} from "firebase/auth";
+
+import { auth } from "@/lib/firebase";
 
 import {
   farmSummary,
@@ -50,6 +59,19 @@ type WeatherResponse = {
 };
 
 export default function DashboardPage() {
+  /* -------------------------------------------------------
+     Firebase authentication
+  ------------------------------------------------------- */
+
+  const [user, setUser] = useState<User | null>(null);
+
+  const [authLoading, setAuthLoading] =
+    useState(true);
+
+  /* -------------------------------------------------------
+     Dashboard state
+  ------------------------------------------------------- */
+
   const [showNotifications, setShowNotifications] =
     useState(false);
 
@@ -62,37 +84,25 @@ export default function DashboardPage() {
   const [weatherError, setWeatherError] =
     useState("");
 
-  /*
-   * Step 5A:
-   * Load farm intelligence from the
-   * AgroPulse intelligence engine.
-   */
-  const farmIntelligence =
-    getFarmIntelligence();
+  /* -------------------------------------------------------
+     Firebase auth listener
+  ------------------------------------------------------- */
 
-  const attentionFields =
-    farmIntelligence.attentionFields;
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        setUser(currentUser);
+        setAuthLoading(false);
+      },
+    );
 
-  const healthyZones =
-    farmIntelligence.healthyFields;
+    return () => unsubscribe();
+  }, []);
 
-  const attentionZones =
-    farmIntelligence.attentionCount;
-
-  const riskDistribution =
-    farmIntelligence.riskDistribution;
-
-  const primaryAttentionField =
-    attentionFields.length > 0
-      ? attentionFields[0]
-      : null;
-
-  const primaryFieldIntelligence =
-    primaryAttentionField
-      ? getFieldIntelligence(
-          primaryAttentionField.name,
-        )
-      : null;
+  /* -------------------------------------------------------
+     Weather
+  ------------------------------------------------------- */
 
   useEffect(() => {
     async function loadWeather() {
@@ -140,6 +150,41 @@ export default function DashboardPage() {
 
     loadWeather();
   }, []);
+
+  /* -------------------------------------------------------
+     Farm intelligence
+  ------------------------------------------------------- */
+
+  const farmIntelligence =
+    getFarmIntelligence();
+
+  const attentionFields =
+    farmIntelligence.attentionFields;
+
+  const healthyZones =
+    farmIntelligence.healthyFields;
+
+  const attentionZones =
+    farmIntelligence.attentionCount;
+
+  const riskDistribution =
+    farmIntelligence.riskDistribution;
+
+  const primaryAttentionField =
+    attentionFields.length > 0
+      ? attentionFields[0]
+      : null;
+
+  const primaryFieldIntelligence =
+    primaryAttentionField
+      ? getFieldIntelligence(
+          primaryAttentionField.name,
+        )
+      : null;
+
+  /* -------------------------------------------------------
+     Dashboard stats
+  ------------------------------------------------------- */
 
   const stats = [
     {
@@ -207,6 +252,23 @@ export default function DashboardPage() {
           : farmIntelligence.risk,
     },
   ];
+
+  /* -------------------------------------------------------
+     Sign out
+  ------------------------------------------------------- */
+
+  async function handleSignOut() {
+    try {
+      await signOut(auth);
+
+      window.location.href = "/login";
+    } catch (error) {
+      console.error(
+        "Sign out failed:",
+        error,
+      );
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#050706] text-[#f4f7f4]">
@@ -279,6 +341,7 @@ export default function DashboardPage() {
           {/* Header actions */}
           <div className="flex items-center gap-2">
 
+            {/* AI status */}
             <div className="hidden items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1.5 sm:flex">
               <span className="h-1.5 w-1.5 rounded-full bg-[#7dff9a] shadow-[0_0_8px_#7dff9a]" />
 
@@ -369,17 +432,70 @@ export default function DashboardPage() {
               <Settings size={17} />
             </button>
 
-            {/* Login */}
-            <button
-              onClick={() => {
-                window.location.href =
-                  "/login";
-              }}
-              className="hidden items-center gap-2 rounded-xl bg-[#7dff9a] px-3 py-2.5 text-[10px] font-semibold text-[#071008] transition hover:bg-[#9affad] sm:flex"
-            >
-              <LogIn size={14} />
-              Login
-            </button>
+            {/* Authentication */}
+            {authLoading ? (
+              <div className="hidden h-9 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 sm:flex">
+                <span className="text-[9px] text-[#667269]">
+                  Loading...
+                </span>
+              </div>
+            ) : user ? (
+              <div className="flex items-center gap-2">
+
+                {/* User profile */}
+                <div className="hidden items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 sm:flex">
+
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="Profile"
+                      className="h-6 w-6 rounded-full"
+                    />
+                  ) : (
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#7dff9a]/10 text-[9px] font-semibold text-[#7dff9a]">
+                      {(
+                        user.displayName ||
+                        user.email ||
+                        "U"
+                      )
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                  )}
+
+                  <div className="max-w-[130px]">
+                    <p className="truncate text-[9px] font-medium text-white">
+                      {user.displayName ||
+                        "AgroPulse User"}
+                    </p>
+
+                    <p className="truncate text-[8px] text-[#667269]">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sign out */}
+                <button
+                  onClick={handleSignOut}
+                  className="hidden items-center gap-2 rounded-xl border border-white/[0.06] px-3 py-2.5 text-[10px] text-[#8d9891] transition hover:border-[#ff6b6b]/20 hover:bg-[#ff6b6b]/5 hover:text-[#ff7b7b] sm:flex"
+                >
+                  <LogOut size={14} />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  window.location.href =
+                    "/login";
+                }}
+                className="hidden items-center gap-2 rounded-xl bg-[#7dff9a] px-3 py-2.5 text-[10px] font-semibold text-[#071008] transition hover:bg-[#9affad] sm:flex"
+              >
+                <LogIn size={14} />
+                Login
+              </button>
+            )}
           </div>
         </header>
 
@@ -1047,9 +1163,7 @@ function NotificationItem({
 }) {
   return (
     <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3">
-
       <div className="flex items-start gap-2">
-
         <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#f6c453]" />
 
         <div>
@@ -1099,13 +1213,10 @@ function ZoneRow({
 
   return (
     <div className="px-5 py-4 transition hover:bg-white/[0.015]">
-
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
         <div className="min-w-[180px]">
-
           <div className="flex items-center gap-2">
-
             <span
               className={`h-2 w-2 rounded-full ${statusDot}`}
             />
@@ -1141,7 +1252,6 @@ function ZoneRow({
         <div className="flex items-center justify-between gap-4 sm:min-w-[110px] sm:justify-end">
 
           <div className="text-right">
-
             <p className="text-[8px] uppercase tracking-wider text-[#667269]">
               Risk
             </p>
@@ -1172,7 +1282,6 @@ function MetricMini({
 }) {
   return (
     <div>
-
       <p className="text-[8px] uppercase tracking-wider text-[#4f5b53]">
         {label}
       </p>
@@ -1195,7 +1304,6 @@ function PredictionRow({
 }) {
   return (
     <div>
-
       <div className="mb-2 flex items-center justify-between">
 
         <span className="text-[10px] text-[#78837c]">
@@ -1235,7 +1343,6 @@ function EnvironmentCard({
     <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-4">
 
       <div className="flex items-center gap-2 text-[#7dff9a]">
-
         {icon}
 
         <span className="text-[9px] uppercase tracking-wider text-[#667269]">
@@ -1321,7 +1428,6 @@ function ActionCard({
       href={href}
       className="group rounded-2xl border border-white/[0.07] bg-[#0a0f0c] p-5 transition hover:border-[#7dff9a]/20 hover:bg-[#0b110d]"
     >
-
       <div className="flex items-center justify-between">
 
         <span className="text-[#7dff9a]">
