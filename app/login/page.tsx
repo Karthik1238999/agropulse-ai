@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Leaf, Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { Leaf, Lock, Mail, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export default function LoginPage() {
@@ -11,69 +15,120 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
+  // Email / Password Login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setError("");
 
-    if (!email.trim() || !password.trim()) {
+    if (!email || !password) {
       setError("Please enter your email and password.");
       return;
     }
 
-    setLoading(true);
-
     try {
-      await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password
-      );
+      setLoading(true);
 
-      // Login successful
+      await signInWithEmailAndPassword(auth, email, password);
+
       window.location.href = "/";
     } catch (error: unknown) {
       console.error("Login error:", error);
 
-      const firebaseError = error as {
-        code?: string;
-      };
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error
+      ) {
+        const code = (error as { code: string }).code;
 
-      switch (firebaseError.code) {
-        case "auth/invalid-credential":
-          setError("Invalid email or password.");
-          break;
+        switch (code) {
+          case "auth/invalid-credential":
+            setError("Invalid email or password.");
+            break;
 
-        case "auth/user-not-found":
-          setError("No account found with this email.");
-          break;
+          case "auth/user-not-found":
+            setError("No account found with this email.");
+            break;
 
-        case "auth/wrong-password":
-          setError("Incorrect password.");
-          break;
+          case "auth/wrong-password":
+            setError("Incorrect password.");
+            break;
 
-        case "auth/invalid-email":
-          setError("Please enter a valid email address.");
-          break;
+          case "auth/invalid-email":
+            setError("Please enter a valid email address.");
+            break;
 
-        case "auth/too-many-requests":
-          setError(
-            "Too many failed attempts. Please try again later."
-          );
-          break;
+          case "auth/too-many-requests":
+            setError(
+              "Too many failed attempts. Please try again later."
+            );
+            break;
 
-        case "auth/network-request-failed":
-          setError(
-            "Network error. Please check your internet connection."
-          );
-          break;
-
-        default:
-          setError("Unable to sign in. Please try again.");
+          default:
+            setError("Login failed. Please try again.");
+        }
+      } else {
+        setError("Login failed. Please try again.");
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Google Login
+  const handleGoogleLogin = async () => {
+    setError("");
+
+    try {
+      setGoogleLoading(true);
+
+      const provider = new GoogleAuthProvider();
+
+      provider.setCustomParameters({
+        prompt: "select_account",
+      });
+
+      await signInWithPopup(auth, provider);
+
+      window.location.href = "/";
+    } catch (error: unknown) {
+      console.error("Google login error:", error);
+
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error
+      ) {
+        const code = (error as { code: string }).code;
+
+        switch (code) {
+          case "auth/popup-closed-by-user":
+            setError("Google sign-in was cancelled.");
+            break;
+
+          case "auth/popup-blocked":
+            setError(
+              "Google sign-in popup was blocked by your browser."
+            );
+            break;
+
+          case "auth/account-exists-with-different-credential":
+            setError(
+              "An account already exists with this email using another sign-in method."
+            );
+            break;
+
+          default:
+            setError("Google sign-in failed. Please try again.");
+        }
+      } else {
+        setError("Google sign-in failed. Please try again.");
+      }
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -85,21 +140,15 @@ export default function LoginPage() {
       </div>
 
       <div className="relative w-full max-w-[430px]">
-
         {/* Logo */}
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#7dff9a]/20 bg-[#7dff9a]/10">
-            <Leaf
-              size={26}
-              className="text-[#7dff9a]"
-            />
+            <Leaf size={26} className="text-[#7dff9a]" />
           </div>
 
           <h1 className="mt-5 text-2xl font-semibold tracking-[-0.03em]">
             AgroPulse{" "}
-            <span className="text-[#7dff9a]">
-              AI
-            </span>
+            <span className="text-[#7dff9a]">AI</span>
           </h1>
 
           <p className="mt-2 text-xs text-[#667269]">
@@ -109,8 +158,6 @@ export default function LoginPage() {
 
         {/* Login card */}
         <div className="rounded-2xl border border-white/[0.07] bg-[#0a0f0c] p-6 shadow-2xl">
-
-          {/* Header */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold">
               Welcome back
@@ -121,18 +168,11 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Login form */}
-          <form
-            onSubmit={handleLogin}
-            className="space-y-4"
-          >
-
+          {/* Email Login */}
+          <form onSubmit={handleLogin} className="space-y-4">
             {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]"
-              >
+              <label className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]">
                 Email
               </label>
 
@@ -143,26 +183,19 @@ export default function LoginPage() {
                 />
 
                 <input
-                  id="email"
                   type="email"
                   value={email}
-                  onChange={(e) =>
-                    setEmail(e.target.value)
-                  }
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="farmer@example.com"
                   autoComplete="email"
-                  disabled={loading}
-                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]"
-              >
+              <label className="mb-2 block text-[10px] uppercase tracking-wider text-[#667269]">
                 Password
               </label>
 
@@ -173,42 +206,32 @@ export default function LoginPage() {
                 />
 
                 <input
-                  id="password"
                   type="password"
                   value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value)
-                  }
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   autoComplete="current-password"
-                  disabled={loading}
-                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.025] py-3 pl-10 pr-3 text-xs text-white outline-none transition placeholder:text-[#4f5b53] focus:border-[#7dff9a]/40"
                 />
               </div>
             </div>
 
             {/* Error */}
             {error && (
-              <div
-                role="alert"
-                className="rounded-xl border border-[#ff6b6b]/20 bg-[#ff6b6b]/10 px-3 py-2 text-[10px] leading-4 text-[#ff7b7b]"
-              >
+              <div className="rounded-xl border border-[#ff6b6b]/20 bg-[#ff6b6b]/10 px-3 py-2 text-[10px] leading-4 text-[#ff7b7b]">
                 {error}
               </div>
             )}
 
-            {/* Login button */}
+            {/* Email Sign In */}
             <button
               type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7dff9a] py-3 text-xs font-semibold text-[#071008] transition hover:bg-[#9affad] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={loading || googleLoading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7dff9a] py-3 text-xs font-semibold text-[#071008] transition hover:bg-[#9affad] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2
-                    size={14}
-                    className="animate-spin"
-                  />
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-[#071008]/30 border-t-[#071008]" />
                   Signing in...
                 </>
               ) : (
@@ -220,12 +243,63 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Security notice */}
-          <div className="mt-5 rounded-xl border border-[#7dff9a]/10 bg-[#7dff9a]/[0.03] p-3">
-            <p className="text-[9px] leading-4 text-[#667269]">
-              Secure authentication powered by Firebase.
-            </p>
+          {/* Divider */}
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/[0.07]" />
+
+            <span className="text-[9px] uppercase tracking-wider text-[#4f5b53]">
+              OR
+            </span>
+
+            <div className="h-px flex-1 bg-white/[0.07]" />
           </div>
+
+          {/* Google Sign In */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading || googleLoading}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.025] py-3 text-xs font-medium text-white transition hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {googleLoading ? (
+              <>
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                Connecting to Google...
+              </>
+            ) : (
+              <>
+                {/* Google Logo */}
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="#4285F4"
+                    d="M21.35 12.23c0-.78-.07-1.53-.22-2.23H12v4.22h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.38Z"
+                  />
+
+                  <path
+                    fill="#34A853"
+                    d="M12 21.7c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.93-3.31.93-2.54 0-4.7-1.72-5.47-4.04H3.28v2.53A9.74 9.74 0 0 0 12 21.7Z"
+                  />
+
+                  <path
+                    fill="#FBBC05"
+                    d="M6.53 13.78A5.86 5.86 0 0 1 6.22 12c0-.62.11-1.22.31-1.78V7.69H3.28A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.03 4.31l3.25-2.53Z"
+                  />
+
+                  <path
+                    fill="#EA4335"
+                    d="M12 6.18c1.43 0 2.72.49 3.74 1.45l2.8-2.8C16.84 3.24 14.63 2.3 12 2.3a9.74 9.74 0 0 0-8.72 5.39l3.25 2.53C7.3 7.9 9.46 6.18 12 6.18Z"
+                  />
+                </svg>
+
+                Continue with Google
+              </>
+            )}
+          </button>
 
           {/* Continue without signing in */}
           <Link
@@ -236,7 +310,6 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        {/* Footer */}
         <p className="mt-6 text-center text-[9px] text-[#4f5b53]">
           AgroPulse AI · Agricultural Intelligence Platform
         </p>
